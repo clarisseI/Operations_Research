@@ -16,7 +16,17 @@ Jy = (2 * ms * R**2) / 5 + 2 * L**2 * mm
 Jz = (2 * ms * R**2) / 5 + 4 * L**2 * mm
 
 #import K
-K= matlab.loadmat('K.mat')
+data= matlab.loadmat('Operations_Research/K.mat')
+
+# Extract matrices or variables from the .mat file
+K = data['K'] 
+
+#import Kc
+data1=matlab.loadmat('Operations_Research/Kc.mat')
+Kc= data1['Kc']
+
+
+
 
 #slide 35 
 A = np.array([
@@ -50,9 +60,19 @@ B = np.array([
     [0, 0, 0, 0],   
 ])
 
-C= np.array([
-    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-])
+#ref= [x, y,z, p(0)]
+ref=[0,0,10,0]
+Ac= np.array([
+        [0,0,0,0],
+        [0,0,0,0],
+        [0,0,0,0],
+        [0,0,0,0],
+
+    ])
+Bc= np.array([
+        [1,0,0,0],
+        [0,1,0,0],
+        [0,0,1,0],
+        [0,0,0,1],
+
+    ])

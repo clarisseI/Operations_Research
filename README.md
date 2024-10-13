@@ -51,3 +51,5 @@ Reference:
 
 - loading .mat
   https://stackoverflow.com/questions/6780080/open-matlab-file-mat-with-module-pickle-in-python
+#when we use we need to add mg for non_linear instead here we don't do it
+# for linear when we simulate it and get out of the gravity
