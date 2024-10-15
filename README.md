@@ -35,8 +35,7 @@ pip install numpy matplotlib scipy
 To get started, clone this repository to your local machine:
 
 ```bash
-git clone https://github.com/yourusername/quadrotor-simulator.git
-cd quadrotor-simulator
+git clone https://github.com/clarisseI/Operations_Research.git
 ```
 
 ### Running the Simulator
@@ -55,10 +54,10 @@ You can modify the target state values in the simulator by changing the indices 
 
 ```
 quadrotor-simulator/
-├── simulator.py          # Main simulation script
-├── quadrotor_model.py    # Quadrotor dynamics model
-├── controller.py         # Control strategy implementations
-├── trajectories.py       # Trajectory definitions
-└── README.md             # Project documentation
+├── Constraints.py         
+├── dynamic_operation.py    
+├──quadrotor_tests.py         
+├── figure_8_problem.py      
+└── README.md             
 ```
 
