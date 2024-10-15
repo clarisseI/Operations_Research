@@ -1,5 +1,4 @@
 from scipy.io import matlab
-import numpy as np
 
 # Drone parameters
 mq = 0.6  # mass of the quadrotor (Kg)
@@ -17,19 +16,16 @@ Jz = (2 * ms * R**2) / 5 + 4 * L**2 * mm
 
 #import K
 data= matlab.loadmat('Operations_Research/K.mat')
-
-# Extract matrices or variables from the .mat file
 K = data['K'] 
+
 
 #import Kc
 data1=matlab.loadmat('Operations_Research/Kc.mat')
 Kc= data1['Kc']
 
 
-
-
 #slide 35 
-A = np.array([
+A = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0,-g, 0, 0],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, g, 0, 0, 0, 0],
@@ -42,10 +38,10 @@ A = np.array([
     [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
-])
+]
 
 #slide 35
-B = np.array([
+B = [
     [0, 0, 0, 0],
     [0, 0, 0, 0],
     [0, 0, 0, 0],
@@ -58,21 +54,26 @@ B = np.array([
     [0, 0, 0, 0],
     [0, 0, 0, 1/Jz],
     [0, 0, 0, 0],   
-])
-
+]
+C = [
+    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+]
 #ref= [x, y,z, p(0)]
-ref=[0,0,10,0]
-Ac= np.array([
+ref=[1,1,1,1]
+Ac= [
         [0,0,0,0],
         [0,0,0,0],
         [0,0,0,0],
         [0,0,0,0],
 
-    ])
-Bc= np.array([
+    ]
+Bc= [
         [1,0,0,0],
         [0,1,0,0],
         [0,0,1,0],
         [0,0,0,1],
 
-    ])
+    ]

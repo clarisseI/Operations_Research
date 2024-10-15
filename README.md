@@ -1,55 +1,64 @@
-# Operations_Research
+# Quadrotor Simulator
 
-Initial state =[0]\*12
-current state= u px v py w pz thetadot, theta, phidot, phi, phydot, phy
+## Overview
 
-Target state= [0, pxtarget,
-0, pytarget,
-0, pztarget,
-0,0
-0,0
-0,pttarget=0]
+This project is a Python-based simulator for quadrotor dynamics. The simulator aims to visualize the quadrotor's motion and implement various control strategies, including Linear and Non-Linear Quadratic Regulator control methods. The project also allows for testing various trajectories, including a figure-8 pattern.
 
-Solution= solve_ip( time, x(initial state))
+## Features
 
-Control= K.(currentstate- targetstate)
-control[0]= control[0]+ mg
-mg=
-g= 9.81
+- **Mathematical Modeling**: Develop a comprehensive model of quadrotor dynamics.
+- **Control Strategies**:
+  - LQR with feedforward control
+  - LQR with integral control
+- **Trajectory Testing**: Implement various trajectories, including a figure-8 pattern.
+- **Visualization**: Use Matplotlib for real-time visualization of the quadrotor's motion.
 
-Def non_linear(time, current state, target_state, K){
-build u v, w, phi theta, psi from current_State
+## Requirements
 
-    //compute the control
-    control= -K( current-target)
-    control[0]= control[0]+ mg
-    f= control[0]
-    du
-    dv
-    dw
-    dp
-    dq
-    dv
+To run this project, you will need:
 
-    i/jx= control[1]
-    1/jy= control[2]
-    1/jz= control[3]
+- Python 3.x
+- NumPy
+- Matplotlib
+- scipy
 
-    dx= [du, u, dv, v, dw, w, dp, p, dq, q, dv, v]
+You can install the required packages using pip:
 
-    return dx
+```bash
+pip install numpy matplotlib scipy
+```
 
-}
+## Getting Started
 
-def linear( time, current_state, A, B, target_state){
-control= -K(current- target)
-dx= Ax +Bcontrol
-return dx
-}
+### Clone the Repository
 
-Reference:
+To get started, clone this repository to your local machine:
 
-- loading .mat
-  https://stackoverflow.com/questions/6780080/open-matlab-file-mat-with-module-pickle-in-python
-#when we use we need to add mg for non_linear instead here we don't do it
-# for linear when we simulate it and get out of the gravity
+```bash
+git clone https://github.com/yourusername/quadrotor-simulator.git
+cd quadrotor-simulator
+```
+
+### Running the Simulator
+
+To run the simulator, use the following command:
+
+```bash
+python simulator.py
+```
+
+### Modifying Target States
+
+You can modify the target state values in the simulator by changing the indices in the code. The current indices for testing are 7, 9, and 11.
+
+## Project Structure
+
+```
+quadrotor-simulator/
+├── simulator.py          # Main simulation script
+├── quadrotor_model.py    # Quadrotor dynamics model
+├── controller.py         # Control strategy implementations
+├── trajectories.py       # Trajectory definitions
+└── README.md             # Project documentation
+```
+

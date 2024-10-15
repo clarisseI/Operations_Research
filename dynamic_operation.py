@@ -1,9 +1,8 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
 # Import the constants from Constraints
-from Constraints import mq, g, Jx, Jy, Jz, K, A, B,Ac,Bc,ref 
+from Constraints import mq, g, Jx, Jy, Jz, K, A, B,K
 
 def non_linear(time,current_state, target_state,K):
     '''
@@ -51,38 +50,12 @@ def linear(time,current_state, A,B, target_state,K):
     
     return dx
 
-def non_linear_integral_control(current_state):
-    dx= Ac@ current_state + Bc @ ref
-    return dx
-
-def Feedforward_control(current_state, target_state):
-    dx= -K(current_state-target_state)
-    return dx
-
 def solve_quadrotor_dynamics(initial_state, target_state, time_span, time_eval):
     # Solve nonlinear dynamics
     sol_non_linear = solve_ivp(non_linear, time_span, initial_state, args=(target_state, K), t_eval=time_eval)
     
     # Solve linear dynamics
     sol_linear = solve_ivp(linear, time_span, initial_state, args=(A, B, target_state, K), t_eval=time_eval)
-
+    
     return sol_non_linear, sol_linear
-
-'''
-def non_linear_integral_control():
-    pass
-     K and Kc
-
-
-
-'''
-
-# we use linear control based on the linear system, while the non-linear if i give xd a particular value, the linear system will get there but the non-linear may not reach because it is to far away
-# we limit the control value, we give the threshold
-
-
-'''
-1. 3D x,y,z
-2. Position vs time 
-
-'''
+    
