@@ -26,7 +26,7 @@ class ReferenceGovernor:
         M= Hx.shape[0]
         k= np.zeros(M)
         for j in range(M):
-            alpha=
+            alpha
             if alpha > 0:
                 k[j] = beta / alpha
             elif alpha < 0:
