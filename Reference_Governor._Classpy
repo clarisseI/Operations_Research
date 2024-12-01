@@ -17,6 +17,7 @@ class ReferenceGovernor:
     def rg( Hx, Hv, h, ref, vk, current_state:xx):
         x0 = np.zeros(12,1)  #Initial state
         ts = 0.01 # Sampling time
+        ts1= 0.1
         ref = 3 * [1, 1, 1, 0] # Desired point
         vk = 0.01 * ref # Initial feasible v0
         ell_star = 1000
@@ -26,18 +27,32 @@ class ReferenceGovernor:
         M= Hx.shape[0]
         k= np.zeros(M)
         for j in range(M):
-            alpha
-            if alpha > 0:
-                k[j] = beta / alpha
-            elif alpha < 0:
+            
+            
+            Betta= h[j]-Hx[j] * x0[j] - Hv[j] @ vk[:1]
+            Alpha= 
+            
+            if Betta <0:
+                kappa=0
+            
+            if kappa > 0:
+                k[j] = Betta / kappa
+            elif kappa < 0:
                 k[j] = 0
             else:
                 k[j] = 1
+                
 
         # Find the minimum value of k
         min_k = np.min(k)
+        # if kappa =0 skip and have it be the min
         
         pass
+    for i in range(1, N):
+        if j mod 10=0:  # time to update the reference govenor
+            kappa= rg(vk, x0, Hx, Hv, h)
+            vk= vk + kappa(r-vk)
+            
     def Hx(self, S, Ad, l_star):
         ''''
         Computes the Hx matrix [Sx | SAx | ... | SA^ℓ*x].

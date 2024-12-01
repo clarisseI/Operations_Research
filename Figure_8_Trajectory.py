@@ -9,11 +9,14 @@ def generate_waypoints_figure_8(x_amplitude, y_amplitude, omega, z0, steps):
     y = y_amplitude * np.sin(2 * omega * t)
     z = np.full_like(t, z0)
 
-    waypoints = []
+    # Initialize waypoints array with shape (steps, 12)
+    waypoints = np.zeros((steps, 12))
+    
     for i in range(steps):
-        waypoints.append([0, x[i], 0, y[i], 0, z[i], 0, 0, 0, 0, 0, 0])
+        waypoints[i, :] = [0, x[i], 0, y[i], 0, z[i], 0, 0, 0, 0, 0, 0]
+    
 
-    return t, waypoints
+    return waypoints
 
 # drone is close to the current waypoints before generating the next one
 
