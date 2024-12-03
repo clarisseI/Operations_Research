@@ -124,7 +124,7 @@ S = np.block([[-K, Kc],
 
 K_hat= np.block([K, -Kc])  # Combine K and -Kc into a single matrix
 
-s = np.array([6, 0.005, 0.005, 0.005, 6, 0.005, 0.005, 0.005]).reshape(-1, 1)
+s = np.array([6, 0.005, 0.005, 0.005, 6, 0.005, 0.005, 0.005]).T
 # Figure 8 parameters
 x_amplitude = 2         
 y_amplitude = 1         
