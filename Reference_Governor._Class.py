@@ -414,7 +414,7 @@ def plot_kappa_over_time(kappa_total_linear, kappa_total_non_linear, tt):
     fig, ax5 = plt.subplots(figsize=(10, 6))
 
     # Plot kappa values for the linear model with solid line
-    ax5.plot(tt[::10], kappa_total_linear[:len(tt[::10])], label='Kappas (Linear)', color='blue', linestyle=':')
+    ax5.plot(tt[::10], kappa_total_linear[:len(tt[::10])], label='Kappas (Linear)', color='blue', linestyle='-')
 
     # Plot kappa values for the nonlinear model with dashed line
     ax5.plot(tt[::10], kappa_total_non_linear[:len(tt[::10])], label='Kappas (Nonlinear)', color='red', linestyle='--')
