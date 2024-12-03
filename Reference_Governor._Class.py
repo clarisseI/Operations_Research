@@ -162,6 +162,7 @@ def SRG_linear(model="linear"):
     xx[:, 0] = x0.flatten()
  
     kappa_total=[]
+    xc=np.zeros(4) # control 
     
     cu= np.zeros((4, N))
     
@@ -177,14 +178,7 @@ def SRG_linear(model="linear"):
             vk= vk + kappa *(ref-vk)
             
         #compute integral control
-        cu[:, i]= -K @ xx[:12, i-1] + Kc @ xx[12:16, i-1]
-       
-        
-        ## for non-linear
-        #u, xc= qds_non_linear(xx[:, i-1], ref)
-
-        xx[12:, i]= xx[12:, i-1] + \
-                          (vk.reshape(1, 4)[0]- xx[[1,3,5,11], i-1]) *ts
+        cu[:, i]= -K @ xx[:12, i-1] + Kc @ xc
         
         if model == 'linear':
             xx[:12, i]= xx[:12, i-1]+ \
@@ -197,6 +191,13 @@ def SRG_linear(model="linear"):
                             qds_non_linear(xx[:12,i-1],cu[:, i])*ts
 
        # store current state
+        e = np.array([
+        ref[0] - xx[1, i-1],  # x-position error
+        ref[1] - xx[3, i-1],  # y-position error
+        ref[2] - xx[5, i-1],  # z-position error
+        ref[3] - xx[11, i-1]  # yaw error (psi)
+    ])
+        xc = xc + e * ts  # Update integral error
        
         # Store cu values into cu_total
         cu_total[:, i] = cu[:, i]
@@ -429,6 +430,12 @@ def plot_kappa_over_time(kappa_total_linear, kappa_total_non_linear, tt):
 
     # Show the plot
     plt.show()
+    
+    
+
+
+
+
          
 if __name__ == '__main__':
     # Simulate both models
@@ -450,6 +457,7 @@ if __name__ == '__main__':
     
   # Now call the plotting function
     plot_kappa_over_time(kappa_total_linear, kappa_total_non_linear, tt)
-            
 
+
+    
     
