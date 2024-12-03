@@ -292,7 +292,16 @@ def compare_xyz_positions(time_eval, x_total_linear, x_total_nonlinear):
     print(tabulate(table_data, headers=headers, tablefmt="fancy_grid", numalign="center", stralign="center"))
 
 
+
 def plot_controls(xc, tt, title="Control Inputs with Constraints"):
+    """
+    Plots control inputs with constraints for linear or nonlinear models.
+
+    Parameters:
+    - xc: Control input array (shape: [4, N])
+    - tt: Time array (shape: [N])
+    - title: Title for the entire plot (default: "Control Inputs with Constraints")
+    """
     # Create a 2x2 grid for the subplots to optimize space usage
     fig, axs = plt.subplots(2, 2, figsize=(12, 10))
 
@@ -322,13 +331,83 @@ def plot_controls(xc, tt, title="Control Inputs with Constraints"):
             axs[j//2, j%2].set_ylim(min(np.min(xc[0, :]) - 0.1, 0), 6 + 0.1)
         else:
             axs[j//2, j%2].set_ylim(np.min(xc[j, :]) - 0.001, np.max(xc[j, :]) + 0.001)
-        
-    fig.suptitle(title, fontsize=18, fontweight='bold', y=1.05)
 
-    # Optimize layout to avoid overlap
-    plt.tight_layout(pad=3.0)
+    # Add the dynamic title for the entire figure
+    fig.suptitle(title, fontsize=18, fontweight='bold')
+
+    # Optimize layout to avoid overlap, increase the space for title
+    plt.tight_layout(pad=3.0, h_pad=2.0, rect=[0, 0, 1, 0.96])
+
     plt.show()
+def plot_control_inputs_side_by_side_try(time_eval, cu_total_linear, cu_total_nonlinear):
+    """Plots the control inputs F, tau-phi, tau-theta, and tau-psi for linear and nonlinear models side by side."""
+    fig, axes = plt.subplots(4, 2, figsize=(14, 12))
+    fig.suptitle("Control Inputs (Linear vs Nonlinear) for F, Tau-Phi, Tau-Theta, Tau-Psi", fontsize=12)
 
+    labels = ["F ", "Tau-Phi ", "Tau-Theta ", "Tau-Psi "]
+    control_indices = [0, 1, 2, 3]  # F, Tau-Phi, Tau-Theta, Tau-Psi
+    constraints = [6, 0.005, 0.005, 0.005]  # Constraints for each control input
+
+    for i, (label, idx) in enumerate(zip(labels, control_indices)):
+        # Plot linear control inputs
+        axes[i, 0].plot(time_eval, cu_total_linear[idx, :], label=f"Linear {label}", color="blue")
+        axes[i, 0].set_title(f"Linear {label}", fontsize=10)
+        axes[i, 0].set_ylabel(f"{label} ", fontsize=8)
+        axes[i, 0].set_xlabel("Time (s)", fontsize=8)
+        axes[i, 0].grid()
+        axes[i, 0].legend()
+        # Add constraint lines for linear model
+        axes[i, 0].axhline(y=constraints[idx], color='red', linestyle='--', linewidth=1.5)
+        axes[i, 0].axhline(y=-constraints[idx], color='red', linestyle='--', linewidth=1.5)
+        # Plot nonlinear control inputs
+        axes[i, 1].plot(time_eval, cu_total_nonlinear[idx,:], label=f"Nonlinear {label}", color="red")
+        axes[i, 1].set_title(f"Nonlinear {label}", fontsize=10)
+        axes[i, 1].set_ylabel(f"{label} ", fontsize=8)
+        axes[i, 1].set_xlabel("Time (s)", fontsize=8)
+        axes[i, 1].grid()
+        axes[i, 1].legend()
+        # Add constraint lines for nonlinear model
+        axes[i, 1].axhline(y=constraints[idx], color='green', linestyle=':', linewidth=1.5)
+        axes[i, 1].axhline(y=-constraints[idx], color='green', linestyle=':', linewidth=1.5)
+
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    plt.show()
+def check_constraints(xc_total_linear, xc_total_nonlinear):
+    """Check if the control inputs F, Tau-Phi, Tau-Theta, and Tau-Psi violate the constraints."""
+    labels = ["F", "Tau-Phi", "Tau-Theta", "Tau-Psi"]
+    control_indices = [0, 1, 2, 3]  # F, Tau-Phi, Tau-Theta, Tau-Psi
+    #constraints_min = [-6, -0.005, -0.005, -0.005]
+    constraints_max = [6, 0.005, 0.005, 0.005]
+
+    table_data = []
+
+    for label, idx in zip(labels, control_indices):
+        # Find the indices where the control inputs violate the constraints
+        # Check linear control violations using absolute value
+        linear_violations = np.where(np.abs(xc_total_linear[idx,:]) > constraints_max[idx])[0]
+        nonlinear_violations = np.where(np.abs(xc_total_nonlinear[idx,: ] >= constraints_max[idx]))[0]
+
+        # Prepare the violation results for linear
+        if len(linear_violations) > 0:
+            linear_result = 'yes'  
+        else:
+            linear_result = "No"
+
+        # Prepare the violation results for nonlinear
+        if len(nonlinear_violations) > 0:
+            nonlinear_result = 'yes'
+        else:
+            nonlinear_result = "No"
+
+        # Append the results to the table data
+        table_data.append([label, linear_result, nonlinear_result])
+
+    # Define the table headers
+    headers = ["Control Input", "Linear Violation", "Nonlinear Violation"]
+
+    # Display the results in a nice tabular format
+    print("\nControl Input Violation Summary:")
+    print(tabulate(table_data, headers=headers, tablefmt="fancy_grid", numalign="center", stralign="center"))
          
 if __name__ == '__main__':
     # Simulate both models
@@ -338,20 +417,15 @@ if __name__ == '__main__':
 
 
     # Plot results for state variables side by side
-    #plot_xyz_side_by_side(tt, xx_linear, xx_non_linear)
+    plot_xyz_side_by_side(tt, xx_linear, xx_non_linear)
 
-   # Compare positions (Optional)
+    # Compare positions (Optional)
     compare_xyz_positions(tt, xx_linear, xx_non_linear)
    
-  # Plot the results
-    # Call the function to run animations
-    # For linear controls
-    plot_controls(xc_linear, tt, title="Linear SRG Constraints")
+    #plot conntrols and compare them.
 
-        # For nonlinear controls
-    plot_controls(xc_non_linear, tt, title="Nonlinear SRG Constraints")
-
-    #compare_xyz_positions(tt,xc_linear,xc_non_linear)
+    check_constraints(xc_linear,xc_non_linear)
+    plot_control_inputs_side_by_side_try(tt, xc_linear, xc_non_linear)
     
             
 
