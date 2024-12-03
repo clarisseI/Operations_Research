@@ -408,6 +408,27 @@ def check_constraints(xc_total_linear, xc_total_nonlinear):
     # Display the results in a nice tabular format
     print("\nControl Input Violation Summary:")
     print(tabulate(table_data, headers=headers, tablefmt="fancy_grid", numalign="center", stralign="center"))
+
+def plot_kappa_over_time(kappa_total_linear, kappa_total_non_linear, tt):
+    # Create the plot
+    fig, ax5 = plt.subplots(figsize=(10, 6))
+
+    # Plot kappa values for the linear model with solid line
+    ax5.plot(tt[::10], kappa_total_linear[:len(tt[::10])], label='Kappas (Linear)', color='blue', linestyle=':')
+
+    # Plot kappa values for the nonlinear model with dashed line
+    ax5.plot(tt[::10], kappa_total_non_linear[:len(tt[::10])], label='Kappas (Nonlinear)', color='red', linestyle='--')
+
+    # Set plot labels and title
+    ax5.set_title('Kappas over Time for Linear and Nonlinear Models')
+    ax5.set_xlabel('Time')
+    ax5.set_ylabel('Kappa Value')
+
+    # Add a legend
+    ax5.legend()
+
+    # Show the plot
+    plt.show()
          
 if __name__ == '__main__':
     # Simulate both models
@@ -427,6 +448,8 @@ if __name__ == '__main__':
     check_constraints(xc_linear,xc_non_linear)
     plot_control_inputs_side_by_side_try(tt, xc_linear, xc_non_linear)
     
+  # Now call the plotting function
+    plot_kappa_over_time(kappa_total_linear, kappa_total_non_linear, tt)
             
 
     
