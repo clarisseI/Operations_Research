@@ -69,9 +69,7 @@ def H_Matrix( s,epsilon, ell_star):
         h = np.vstack([h, s - epsilon])
 
         return h
-       
-       
-        
+           
 def rg( Hx, Hv, H, ref, vk, x0,current_step):
     """
     Compute the minimum kappa for the reference governor.
@@ -137,7 +135,7 @@ def SRG_linear(model="linear"):
     x0 = np.zeros((16, 1)) # Initial state
   
     
-    ref = np.array([3, 3, 3, 0])
+    ref = np.array([4, 5, 3, 0])
    
     vk = 0.01 * ref # Initial feasible v0
         
@@ -181,14 +179,12 @@ def SRG_linear(model="linear"):
         cu[:, i]= -K @ xx[:12, i-1] + Kc @ xc
         
         if model == 'linear':
-            xx[:12, i]= xx[:12, i-1]+ \
-                                    qds_linear(xx[:12,i-1],cu[:, i])*ts
+            xx[:12, i]= xx[:12, i-1]+ qds_linear(xx[:12,i-1],cu[:, i])*ts
             
         elif model == 'nonlinear':
             #state_change,u= qds_non_linear(xx[:,i-1],ref)
            
-            xx[:12, i]= xx[:12, i-1]+ \
-                            qds_non_linear(xx[:12,i-1],cu[:, i])*ts
+            xx[:12, i]= xx[:12, i-1]+ qds_non_linear(xx[:12,i-1],cu[:, i])*ts
 
        # store current state
         e = np.array([
@@ -431,8 +427,124 @@ def plot_kappa_over_time(kappa_total_linear, kappa_total_non_linear, tt):
     # Show the plot
     plt.show()
     
-    
+def SRG_linear_figure_8(model="linear"):
+    # Generate time and waypoints for figure-8 trajectory
+    waypoints = generate_waypoints_figure_8(x_amplitude, y_amplitude, omega, z0, steps)  
+    y = 0  # Index for waypoints
+    len_waypoints = waypoints.shape[0]  # Total number of waypoints
 
+    # Create lists to store the trajectory in 3D
+    x_traj, y_traj, z_traj = [], [], []
+    
+    ts = 0.001
+    t = 500
+    ts1= 0.01
+    x0 = np.zeros((16, 1)) # Initial state
+  
+    
+    ref = np.array([3, 3, 3, 0])
+   
+    vk = 0.01 * ref # Initial feasible v0
+        
+    ell_star = 1000
+        
+    tt = np.arange(0, t, ts) #[0:ts:10] #Time interval for the continuous-time system
+        
+    N = tt.size #Number of time steps for Euler’s method
+    
+    cu_total = np.zeros((4, N))   # Control state
+        
+    Hx = Hx_Matrix(S, Ad, ell_star)
+    
+    Hv = Hv_Matrix(S, Ad, Bd, ell_star)
+    
+    epsilon=0.001
+    
+    H= H_Matrix (s,epsilon, ell_star)
+    
+    xx= np.zeros((16, N))  
+
+    xx[:, 0] = x0.flatten()
+ 
+    kappa_total=[]
+    xc=np.zeros(4) # control 
+    
+    cu= np.zeros((4, N))
+    
+        
+    for i in range(2,N):
+        t= (i-1)* ts
+
+        # update the reference governor
+        if t % ts1 < ts :
+            kappa = min(rg(Hx, Hv, H, ref, vk, xx[:, i - 1], i - 1), 1)  # Pass i-1 as current_step
+            kappa_total.append(kappa)
+                
+            vk= vk + kappa *(ref-vk)
+            
+        #compute integral control
+        cu[:, i]= -K @ xx[:12, i-1] + Kc @ xc
+        
+        if model == 'linear':
+            xx[:12, i]= xx[:12, i-1]+ \
+                                    qds_linear(xx[:12,i-1],cu[:, i])*ts
+            
+        elif model == 'nonlinear':
+            #state_change,u= qds_non_linear(xx[:,i-1],ref)
+           
+            xx[:12, i]= xx[:12, i-1]+ \
+                            qds_non_linear(xx[:12,i-1],cu[:, i])*ts
+
+       # store current state
+        e = np.array([
+        waypoints[y, 1] - xx[1, i-1],  # x-position error
+        waypoints[y, 3] - xx[3, i-1],  # y-position error
+        waypoints[y, 5] - xx[5, i-1],  # z-position error
+        waypoints[y, 11] - xx[11, i-1]  # yaw error (psi)
+    ])
+        xc = xc + e * ts  # Update integral error
+       
+       
+       # Calculate distance between the current state and the waypoint
+        dist = np.sqrt(
+            (xx[1, i-1] - waypoints[y, 1]) ** 2 + 
+            (xx[3, i-1] - waypoints[y, 3]) ** 2 + 
+            (xx[5, i-1] - waypoints[y, 5]) ** 2
+        )
+
+        # If the distance is less than 0.01, move to the next waypoint
+        if dist <= 0.1:
+            
+            # Store current position for plotting
+            x_traj.append(xx[1, i-1])  # x position
+            y_traj.append(xx[3, i-1])  # y position
+            z_traj.append(xx[5, i-1])  # z position
+            y += 1  # Move to the next waypoint
+            # Ensure waypoint_t doesn't go out of bounds
+            if y >= len_waypoints:
+                y = len_waypoints - 1  # Stay at the last waypoint
+        # Store cu values into cu_total
+        cu_total[:, i] = cu[:, i]
+        
+    return tt, x_traj, y_traj, z_traj, waypoints,
+def plot_3d_trajectory(x_traj, y_traj, z_traj, waypoints):
+    """Plot the 3D trajectory and waypoints."""
+    fig = plt.figure(figsize=(14, 8))
+    ax = fig.add_subplot(111, projection='3d')
+
+   # Plot the drone trajectory as a solid red line
+    ax.plot(x_traj, y_traj, z_traj, label="Drone Trajectory", color="green",linestyle="dashdot", linewidth=2)
+
+    # Plot the waypoints as a semi-transparent dashed blue line
+    ax.plot(waypoints[:, 1], waypoints[:, 3], waypoints[:, 5], 
+            color="purple", linestyle="--", linewidth=1, alpha=0.7, label="Waypoints")
+    ax.set_xlabel("X Position (m)")
+    ax.set_ylabel("Y Position (m)")
+    ax.set_zlabel("Z Position (m)")
+    ax.set_title("Drone Trajectory vs Waypoints")
+    ax.legend()
+
+    plt.show()
 
 
 
@@ -442,7 +554,11 @@ if __name__ == '__main__':
     xx_linear, xc_linear, tt, kappa_total_linear = SRG_linear(model="linear")  # For linear model
     xx_non_linear, xc_non_linear, tt, kappa_total_non_linear= SRG_linear(model="nonlinear")  # For nonlinear model
     
-
+    tt, x_traj_linear, y_traj_linear, z_traj_linear, waypoints_linear= SRG_linear_figure_8(model='linear')
+    tt, x_traj_non_linear, y_traj_non_linear, z_traj_non_linear, waypoints_non_linear= SRG_linear_figure_8(model='nonlinear')
+    plot_3d_trajectory(x_traj_linear, y_traj_linear, z_traj_linear, waypoints_linear)
+    plot_3d_trajectory(x_traj_non_linear, y_traj_non_linear, z_traj_non_linear, waypoints_non_linear)
+    
 
     # Plot results for state variables side by side
     plot_xyz_side_by_side(tt, xx_linear, xx_non_linear)
